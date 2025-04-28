@@ -1,10 +1,9 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -22,10 +21,11 @@ model User {
 }
 
 model Employee {
-  id        Int      @id @default(autoincrement())
+  id        Int         @id @default(autoincrement())
   name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  Transaksi Transaksi[]
 }
 
 model ServicesType {
@@ -76,20 +76,23 @@ model Cart {
 }
 
 model Transaksi {
-  id              Int               @id @default(autoincrement())
-  userId          Int
-  cartId          Int
-  paymentStatus   PaymentStatus     @default(UNPAID)
-  totalAmount     Int               @default(0)
-  paymentMethod   paymentMethod     @default(CASH)
-  transactionDate DateTime          @default(now())
-  invoiceNumber   String            @unique @default(cuid())
-  notes           String?           @db.Text
-  user            User              @relation(fields: [userId], references: [id])
-  cart            Cart              @relation(fields: [cartId], references: [id])
-  DetailTransaksi DetailTransaksi[] @relation("TransaksiToDetailTransaksi")
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  id                Int               @id @default(autoincrement())
+  userId            Int
+  cartId            Int
+  employeeId        Int
+  employee          Employee          @relation(fields: [employeeId], references: [id])
+  transactionStatus Status            @default(PENDING)
+  paymentStatus     PaymentStatus     @default(UNPAID)
+  totalAmount       Int               @default(0)
+  paymentMethod     PaymentMethod     @default(CASH)
+  transactionDate   DateTime          @default(now())
+  invoiceNumber     String            @unique @default(cuid())
+  notes             String?           @db.Text
+  user              User              @relation(fields: [userId], references: [id])
+  cart              Cart              @relation(fields: [cartId], references: [id])
+  DetailTransaksi   DetailTransaksi[] @relation("TransaksiToDetailTransaksi")
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
 }
 
 model DetailTransaksi {
@@ -109,10 +112,16 @@ enum Role {
   ADMIN
 }
 
-enum paymentMethod {
+enum PaymentMethod {
   BANK_TRANSFER
   CREDIT_CARD
   CASH
+}
+
+enum Status {
+  PENDING
+  SUCCESS
+  FAILED
 }
 
 enum PaymentStatus {
