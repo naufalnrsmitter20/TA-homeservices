@@ -25,7 +25,7 @@ This guide will help you to clone the project, run it locally, edit it, and push
 2. Clone the repository:
 
     ```bash
-    git clone https://github.com/naufalnrsmittter20/TA-homeservices.git
+    git clone https://github.com/naufalnrsmitter20/TA-homeservices.git
     ```
 
 3. Navigate into the project folder:
