@@ -65,8 +65,14 @@ TA-homeservices/
     ```bash
     npm install
     ```
+    
+3. Gneerate Prisma:
 
-3. Run the backend server:
+    ```bash
+    npx prisma generate
+    ```
+
+4. Run the backend server:
 
     ```bash
     npm run dev
