@@ -1,15 +1,123 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int         @id @default(autoincrement())
+  name      String?
+  email     String      @unique
+  password  String?
+  role      Role        @default(CUSTOMER)
+  Cart      Cart[]
+  Transaksi Transaksi[]
+  Order     Order[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model Employee {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ServicesType {
+  id        Int       @id @default(autoincrement())
+  name      String
+  services  Service[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Service {
+  id             Int           @id @default(autoincrement())
+  cartId         Int?
+  servicesTypeId Int?
+  name           String
+  description    String?
+  attachment     String?
+  price          Int           @default(0)
+  ServicesType   ServicesType? @relation(fields: [servicesTypeId], references: [id])
+  Order          Order[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model Order {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  servicesId Int
+  cartId     Int?
+  qty        Int      @default(1)
+  subtotal   Int      @default(0)
+  user       User     @relation(fields: [userId], references: [id])
+  service    Service  @relation(fields: [servicesId], references: [id])
+  Cart       Cart?    @relation(fields: [cartId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Cart {
+  id          Int         @id @default(autoincrement())
+  userId      Int
+  totalAmount Int         @default(0)
+  user        User        @relation(fields: [userId], references: [id])
+  order       Order[]
+  Transaksi   Transaksi[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Transaksi {
+  id              Int               @id @default(autoincrement())
+  userId          Int
+  cartId          Int
+  paymentStatus   PaymentStatus     @default(UNPAID)
+  totalAmount     Int               @default(0)
+  paymentMethod   paymentMethod     @default(CASH)
+  transactionDate DateTime          @default(now())
+  invoiceNumber   String            @unique @default(cuid())
+  notes           String?           @db.Text
+  user            User              @relation(fields: [userId], references: [id])
+  cart            Cart              @relation(fields: [cartId], references: [id])
+  DetailTransaksi DetailTransaksi[] @relation("TransaksiToDetailTransaksi")
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model DetailTransaksi {
+  id          Int       @id @default(autoincrement())
+  servicesId  Int
+  serviceName String
+  qty         Int       @default(1)
+  subtotal    Int       @default(0)
+  transaksiId Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  Transaksi   Transaksi @relation("TransaksiToDetailTransaksi", fields: [transaksiId], references: [id])
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum paymentMethod {
+  BANK_TRANSFER
+  CREDIT_CARD
+  CASH
+}
+
+enum PaymentStatus {
+  PAID
+  UNPAID
+  REFUNDED
+  CANCELLED
 }
