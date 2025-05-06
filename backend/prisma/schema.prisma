@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../generated/prisma/client"
 }
 
 datasource db {
@@ -15,7 +16,6 @@ model User {
   role      Role        @default(CUSTOMER)
   Cart      Cart[]
   Transaksi Transaksi[]
-  Order     Order[]
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 }
@@ -45,23 +45,9 @@ model Service {
   attachment     String?
   price          Int           @default(0)
   ServicesType   ServicesType? @relation(fields: [servicesTypeId], references: [id])
-  Order          Order[]
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
-}
-
-model Order {
-  id         Int      @id @default(autoincrement())
-  userId     Int
-  servicesId Int
-  cartId     Int?
-  qty        Int      @default(1)
-  subtotal   Int      @default(0)
-  user       User     @relation(fields: [userId], references: [id])
-  service    Service  @relation(fields: [servicesId], references: [id])
-  Cart       Cart?    @relation(fields: [cartId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  Cart           Cart?         @relation(fields: [cartId], references: [id])
 }
 
 model Cart {
@@ -69,7 +55,7 @@ model Cart {
   userId      Int
   totalAmount Int         @default(0)
   user        User        @relation(fields: [userId], references: [id])
-  order       Order[]
+  service     Service[]
   Transaksi   Transaksi[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
