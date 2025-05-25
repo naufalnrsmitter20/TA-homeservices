@@ -219,7 +219,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\SMK TELKOM 003\\OneDrive\\Documents\\Folder Programing Website\\TA_homeservices\\backend\\generated\\prisma\\client",
+      "value": "C:\\Users\\SMK TELKOM 26\\Documents\\TUGAS SIVA\\Tugas Akhir\\TA-homeservices\\backend\\generated\\prisma\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -233,11 +233,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\SMK TELKOM 003\\OneDrive\\Documents\\Folder Programing Website\\TA_homeservices\\backend\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\SMK TELKOM 26\\Documents\\TUGAS SIVA\\Tugas Akhir\\TA-homeservices\\backend\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../../../.env",
+    "rootEnvPath": null,
     "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../../../prisma",
