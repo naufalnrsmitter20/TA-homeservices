@@ -2,14 +2,14 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import prisma from "../lib/prisma";
 
-export const getAllUsers = async (request: Request, response: Response) => {
+export const getAllUsers = async (req: Request, res: Response) => {
   try {
-    const { search } = request.query;
+    const { search } = req.query;
     const allUser = await prisma.user.findMany({
       where: { name: { contains: search?.toString() || "" } },
     });
 
-    response
+    res
       .json({
         status: true,
         data: allUser,
@@ -19,7 +19,7 @@ export const getAllUsers = async (request: Request, response: Response) => {
     return;
   } catch (error) {
     console.log(error as Error);
-    response
+    res
       .json({
         status: false,
         message: `There is an error. ${error}`,
@@ -29,14 +29,14 @@ export const getAllUsers = async (request: Request, response: Response) => {
   }
 };
 
-export const getUserById = async (request: Request, response: Response) => {
+export const getUserById = async (req: Request, res: Response) => {
   try {
-    const { id } = request.params;
+    const { id } = req.params;
     const checkUser = await prisma.user.findUnique({
       where: { id: Number(id) },
     });
     if (!checkUser) {
-      response
+      res
         .json({
           status: false,
           message: `User Not Found`,
@@ -45,7 +45,7 @@ export const getUserById = async (request: Request, response: Response) => {
       return;
     }
 
-    response
+    res
       .json({
         status: true,
         data: checkUser,
@@ -55,7 +55,7 @@ export const getUserById = async (request: Request, response: Response) => {
     return;
   } catch (error) {
     console.log(error as Error);
-    response
+    res
       .json({
         status: false,
         message: `There is an error. ${error}`,
@@ -65,25 +65,25 @@ export const getUserById = async (request: Request, response: Response) => {
   }
 };
 
-export const createUser = async (request: Request, response: Response) => {
+export const createUser = async (req: Request, res: Response) => {
   try {
     /** get requested data (data has been sent from request) */
-    const { name, email, password, role } = request.body;
+    const { name, email, password, role } = req.body;
 
     const findEmail = await prisma.user.findFirst({
       where: { email },
     });
 
     if (findEmail) {
-      response.status(403).json({ status: false, message: `Email already exists` });
+      res.status(403).json({ status: false, message: `Email already exists` });
       return;
     }
 
     const newUser = await prisma.user.create({
-      data: { name, email, password: await bcrypt.hash(password, 10), role },
+      data: { name, email, password: await bcrypt.hash(password, 10), role, createdAt: new Date(), updatedAt: new Date() },
     });
 
-    response
+    res
       .json({
         status: true,
         data: newUser,
@@ -93,7 +93,7 @@ export const createUser = async (request: Request, response: Response) => {
     return;
   } catch (error) {
     console.log(error as Error);
-    response
+    res
       .json({
         status: false,
         message: `There is an error. ${error}`,
@@ -103,14 +103,14 @@ export const createUser = async (request: Request, response: Response) => {
   }
 };
 
-export const updateUser = async (request: Request, response: Response) => {
+export const updateUser = async (req: Request, res: Response) => {
   try {
-    const { id } = request.params;
-    const { name, email, password, role } = request.body;
+    const { id } = req.params;
+    const { name, email, password, role } = req.body;
 
     const findUser = await prisma.user.findFirst({ where: { id: Number(id) } });
     if (!findUser) {
-      response.status(404).json({ status: false, message: `user is not found` });
+      res.status(404).json({ status: false, message: `user is not found` });
       return;
     }
 
@@ -120,11 +120,12 @@ export const updateUser = async (request: Request, response: Response) => {
         email: email || findUser.email,
         password: password ? await bcrypt.hash(password, 10) : findUser.password,
         role: role || findUser.role,
+        updatedAt: new Date(),
       },
       where: { id: Number(id) },
     });
 
-    response
+    res
       .json({
         status: true,
         data: updatedUser,
@@ -135,7 +136,7 @@ export const updateUser = async (request: Request, response: Response) => {
   } catch (error) {
     console.log(error as Error);
 
-    response
+    res
       .json({
         status: false,
         message: `There is an error. ${error}`,
@@ -145,18 +146,18 @@ export const updateUser = async (request: Request, response: Response) => {
   }
 };
 
-export const deleteUser = async (request: Request, response: Response) => {
+export const deleteUser = async (req: Request, res: Response) => {
   try {
-    const { id } = request.params;
+    const { id } = req.params;
     const findUser = await prisma.user.findFirst({ where: { id: Number(id) } });
     if (!findUser) {
-      response.status(200).json({ status: false, message: `user is not found` });
+      res.status(200).json({ status: false, message: `user is not found` });
       return;
     }
     const deleteduser = await prisma.user.delete({
       where: { id: Number(id) },
     });
-    response
+    res
       .json({
         status: true,
         data: deleteduser,
@@ -166,7 +167,7 @@ export const deleteUser = async (request: Request, response: Response) => {
     return;
   } catch (error) {
     console.log(error as Error);
-    response
+    res
       .json({
         status: false,
         message: `There is an error. ${error}`,
@@ -175,40 +176,3 @@ export const deleteUser = async (request: Request, response: Response) => {
     return;
   }
 };
-
-// export const authentication = async (request: Request, response: Response) => {
-//   try {
-//     const { email, password } = request.body; /** get requested data (data has been sent from request) */
-
-//     /** find a valid admin based on username and password */
-//     const findUser = await prisma.user.findFirst({
-//       where: { email, password: md5(password) },
-//     });
-
-//     /** check is admin exists */
-//     if (!findUser) return response.status(200).json({ status: false, logged: false, message: `Email or password is invalid` });
-
-//     let data = {
-//       id: findUser.id,
-//       name: findUser.name,
-//       email: findUser.email,
-//       role: findUser.role,
-//       profile_picture: findUser.profile_picture,
-//     };
-
-//     /** define payload to generate token */
-//     let payload = JSON.stringify(data);
-
-//     /** generate token */
-//     let token = sign(payload, SECRET || "joss");
-
-//     return response.status(200).json({ status: true, logged: true, data: data, message: `Login Success`, token });
-//   } catch (error) {
-//     return response
-//       .json({
-//         status: false,
-//         message: `There is an error. ${error}`,
-//       })
-//       .status(400);
-//   }
-// };
