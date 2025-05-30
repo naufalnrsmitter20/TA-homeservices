@@ -22,6 +22,9 @@ model User {
 model Employee {
   id        Int         @id @default(autoincrement())
   name      String
+  email     String      @unique
+  phone     String?
+  position  String
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
   Transaksi Transaksi[]
@@ -55,7 +58,7 @@ model Cart {
   totalAmount Int         @default(0)
   user        User        @relation(fields: [userId], references: [id])
   service     Service[]
-  Transaksi   Transaksi[]
+
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 }
@@ -63,7 +66,6 @@ model Cart {
 model Transaksi {
   id                Int               @id @default(autoincrement())
   userId            Int
-  cartId            Int
   employeeId        Int
   employee          Employee          @relation(fields: [employeeId], references: [id])
   transactionStatus Status            @default(PENDING)
@@ -74,7 +76,6 @@ model Transaksi {
   invoiceNumber     String            @unique @default(cuid())
   notes             String?           @db.Text
   user              User              @relation(fields: [userId], references: [id])
-  cart              Cart              @relation(fields: [cartId], references: [id])
   DetailTransaksi   DetailTransaksi[] @relation("TransaksiToDetailTransaksi")
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
@@ -84,8 +85,7 @@ model DetailTransaksi {
   id          Int       @id @default(autoincrement())
   servicesId  Int
   serviceName String
-  qty         Int       @default(1)
-  subtotal    Int       @default(0)
+  servicePrice    Int       @default(0)
   transaksiId Int
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt

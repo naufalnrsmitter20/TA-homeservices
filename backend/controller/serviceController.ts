@@ -129,15 +129,17 @@ export const UpdateService = async (req: Request, res: Response) => {
   try {
     const file = req.file;
     const { id } = req.params;
-    if (!file || !file.buffer) {
-      res.status(400).json({
+    const { name, description, price, servicesTypeId } = req.body;
+    const checkExistingService = await prisma.service.findUnique({
+      where: { id: Number(id) },
+    });
+    if (!checkExistingService) {
+      res.status(404).json({
         status: false,
-        message: "Image file is required",
+        message: `Service Not Found`,
       });
       return;
     }
-    const { name, description, price, servicesTypeId } = req.body;
-
     const findServicesType = await prisma.servicesType.findUnique({
       where: { id: Number(servicesTypeId) },
     });
@@ -172,7 +174,8 @@ export const UpdateService = async (req: Request, res: Response) => {
       imageUrl = result.secure_url;
     }
 
-    const create = await prisma.service.create({
+    const create = await prisma.service.update({
+      where: { id: Number(id) },
       data: {
         name: name ?? "",
         description: description ?? "",
