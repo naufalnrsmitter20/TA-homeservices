@@ -19,6 +19,7 @@ CREATE TABLE "User" (
     "role" "Role" NOT NULL DEFAULT 'CUSTOMER',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "cartId" INTEGER,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -27,6 +28,9 @@ CREATE TABLE "User" (
 CREATE TABLE "Employee" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "phone" TEXT,
+    "position" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -37,6 +41,7 @@ CREATE TABLE "Employee" (
 CREATE TABLE "ServicesType" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -59,20 +64,6 @@ CREATE TABLE "Service" (
 );
 
 -- CreateTable
-CREATE TABLE "Order" (
-    "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
-    "servicesId" INTEGER NOT NULL,
-    "cartId" INTEGER,
-    "qty" INTEGER NOT NULL DEFAULT 1,
-    "subtotal" INTEGER NOT NULL DEFAULT 0,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Cart" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
@@ -87,7 +78,6 @@ CREATE TABLE "Cart" (
 CREATE TABLE "Transaksi" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
-    "cartId" INTEGER NOT NULL,
     "employeeId" INTEGER NOT NULL,
     "transactionStatus" "Status" NOT NULL DEFAULT 'PENDING',
     "paymentStatus" "PaymentStatus" NOT NULL DEFAULT 'UNPAID',
@@ -107,8 +97,7 @@ CREATE TABLE "DetailTransaksi" (
     "id" SERIAL NOT NULL,
     "servicesId" INTEGER NOT NULL,
     "serviceName" TEXT NOT NULL,
-    "qty" INTEGER NOT NULL DEFAULT 1,
-    "subtotal" INTEGER NOT NULL DEFAULT 0,
+    "servicePrice" INTEGER NOT NULL DEFAULT 0,
     "transaksiId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -120,19 +109,19 @@ CREATE TABLE "DetailTransaksi" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Employee_email_key" ON "Employee"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Cart_userId_key" ON "Cart"("userId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Transaksi_invoiceNumber_key" ON "Transaksi"("invoiceNumber");
 
 -- AddForeignKey
 ALTER TABLE "Service" ADD CONSTRAINT "Service_servicesTypeId_fkey" FOREIGN KEY ("servicesTypeId") REFERENCES "ServicesType"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Order" ADD CONSTRAINT "Order_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Order" ADD CONSTRAINT "Order_servicesId_fkey" FOREIGN KEY ("servicesId") REFERENCES "Service"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Order" ADD CONSTRAINT "Order_cartId_fkey" FOREIGN KEY ("cartId") REFERENCES "Cart"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Service" ADD CONSTRAINT "Service_cartId_fkey" FOREIGN KEY ("cartId") REFERENCES "Cart"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Cart" ADD CONSTRAINT "Cart_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -142,9 +131,6 @@ ALTER TABLE "Transaksi" ADD CONSTRAINT "Transaksi_employeeId_fkey" FOREIGN KEY (
 
 -- AddForeignKey
 ALTER TABLE "Transaksi" ADD CONSTRAINT "Transaksi_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Transaksi" ADD CONSTRAINT "Transaksi_cartId_fkey" FOREIGN KEY ("cartId") REFERENCES "Cart"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "DetailTransaksi" ADD CONSTRAINT "DetailTransaksi_transaksiId_fkey" FOREIGN KEY ("transaksiId") REFERENCES "Transaksi"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

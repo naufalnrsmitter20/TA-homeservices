@@ -30,9 +30,12 @@ export const GetAllCartUser = async (req: Request, res: Response) => {
 };
 export const GetCartUserById = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const token = req.headers["authorization"]?.split(" ")[1];
+    const decodeToken = jwt.decode(token!);
+    const data = decodeToken as UserData;
+
     const checkCart = await prisma.user.findUnique({
-      where: { id: Number(id) },
+      where: { id: Number(data.id) },
       include: {
         Cart: {
           include: {
@@ -70,6 +73,9 @@ export const AddToCart = async (req: Request, res: Response) => {
     const data = decodeToken as UserData;
     const checkExistingUser = await prisma.user.findUnique({
       where: { id: Number(data.id) },
+      include: {
+        Cart: true,
+      },
     });
     if (!checkExistingUser) {
       res.status(404).json({ message: "User not found" });
@@ -83,26 +89,57 @@ export const AddToCart = async (req: Request, res: Response) => {
       res.status(400).json({ message: "Some service IDs are invalid" });
       return;
     }
-
-    const newCart = await prisma.cart.create({
-      data: {
-        userId: Number(data.id),
-        service: {
-          connect: serviceId.map((id: number) => ({ id })),
+    if (checkExistingUser.Cart?.id) {
+      const existingCart = await prisma.cart.findUnique({
+        where: { id: checkExistingUser.Cart.id },
+        include: {
+          service: true,
         },
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        totalAmount: checkExistingService.reduce((total, service) => total + service.price, 0),
-      },
-      include: {
-        service: true,
-      },
-    });
-    res.status(201).json({
-      status: true,
-      data: newCart,
-      message: "Service has been added to cart",
-    });
+      });
+      if (!existingCart) {
+        res.status(404).json({ message: "Cart not found" });
+        return;
+      }
+      const updatedCart = await prisma.cart.update({
+        where: { id: existingCart.id },
+        data: {
+          service: {
+            connect: serviceId.map((id: number) => ({ id })),
+            disconnect: existingCart.service.filter((service) => !serviceId.includes(service.id as never)).map((service) => ({ id: service.id })),
+          },
+          updatedAt: new Date(),
+          totalAmount: checkExistingService.reduce((total, service) => total + service.price, 0),
+        },
+        include: {
+          service: true,
+        },
+      });
+      res.status(200).json({
+        status: true,
+        data: updatedCart,
+        message: "Service has been updated to cart",
+      });
+    } else {
+      const newCart = await prisma.cart.create({
+        data: {
+          userId: Number(data.id),
+          service: {
+            connect: serviceId.map((id: number) => ({ id })),
+          },
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          totalAmount: checkExistingService.reduce((total, service) => total + service.price, 0),
+        },
+        include: {
+          service: true,
+        },
+      });
+      res.status(201).json({
+        status: true,
+        data: newCart,
+        message: "Service has been added to cart",
+      });
+    }
   } catch (error) {
     console.log(error as Error);
     res.status(500).json({

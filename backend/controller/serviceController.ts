@@ -8,6 +8,9 @@ export const GetAllService = async (req: Request, res: Response) => {
     const { search } = req.query;
     const allServices = await prisma.service.findMany({
       where: { name: { contains: search?.toString() || "" } },
+      include: {
+        ServicesType: true,
+      },
     });
     res
       .json({

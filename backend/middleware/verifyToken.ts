@@ -26,6 +26,7 @@ export const verifyAdmin = (req: Request, res: Response, next: NextFunction) => 
     }
     const decodeToken = jwt.decode(token);
     const data = decodeToken as UserData;
+
     if (!decodeToken || data.role !== "ADMIN") {
       res.status(403).json({ message: "Forbidden, Only Admin can access!" });
       return;

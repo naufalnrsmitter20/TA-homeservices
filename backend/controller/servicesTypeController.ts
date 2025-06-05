@@ -55,10 +55,11 @@ export const GetServicesTypeById = async (req: Request, res: Response) => {
 
 export const CreateServicesType = async (req: Request, res: Response) => {
   try {
-    const { name } = req.body;
+    const { name, description } = req.body;
     const create = await prisma.servicesType.create({
       data: {
         name,
+        description,
       },
     });
     if (!create) {
@@ -87,7 +88,7 @@ export const CreateServicesType = async (req: Request, res: Response) => {
 export const UpdateServicesType = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { name } = req.body;
+    const { name, description } = req.body;
 
     const checkServicesType = await prisma.servicesType.findUnique({
       where: { id: Number(id) },
@@ -102,7 +103,7 @@ export const UpdateServicesType = async (req: Request, res: Response) => {
 
     const update = await prisma.servicesType.update({
       where: { id: Number(id) },
-      data: { name },
+      data: { name, description },
     });
 
     res

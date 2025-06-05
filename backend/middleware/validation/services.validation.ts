@@ -27,6 +27,7 @@ const ServicesSchemaUpdated = joi.object({
 });
 const ServicesTypechema = joi.object({
   name: joi.string().min(3).max(30).required(),
+  description: joi.string().min(10).max(500).required(),
 });
 export const ValidateCreateServices = (req: Request, res: Response, next: NextFunction) => {
   const { error } = ServicesSchema.validate(req.body);
