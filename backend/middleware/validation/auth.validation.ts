@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from "express";
 const RegisterSchema = joi.object({
   name: joi.string().min(3).max(30).required(),
   email: joi.string().email().required(),
-  password: joi.string().min(6).max(30).required(),
+  password: joi.string().min(6).max(30).optional(),
   role: joi.string().valid("CUSTOMER", "ADMIN").optional(),
 });
 const LoginSchema = joi.object({

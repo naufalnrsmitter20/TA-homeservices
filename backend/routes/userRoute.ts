@@ -8,7 +8,7 @@ const app = express.Router();
 app.get("/", [verifyAdmin], getAllUsers);
 app.get("/:id", [verifyAdmin], getUserById);
 app.post("/", [verifyAdmin, ValidateUser], createUser);
-app.put("/:id", [verifyAdmin, ValidateUser], updateUser);
+app.put("/:id", [verifyAdmin], updateUser);
 app.delete("/:id", [verifyAdmin], deleteUser);
 
 export default app;

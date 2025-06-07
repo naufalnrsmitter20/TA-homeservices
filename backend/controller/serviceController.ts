@@ -133,6 +133,7 @@ export const UpdateService = async (req: Request, res: Response) => {
     const file = req.file;
     const { id } = req.params;
     const { name, description, price, servicesTypeId } = req.body;
+
     const checkExistingService = await prisma.service.findUnique({
       where: { id: Number(id) },
     });

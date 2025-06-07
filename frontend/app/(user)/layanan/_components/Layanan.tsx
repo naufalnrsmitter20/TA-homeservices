@@ -5,6 +5,7 @@ import { Services, ServiceType } from "@/lib/interfaces";
 import toast from "react-hot-toast";
 import { TrashIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Layanan({ services, serviceType }: { services: Services[]; serviceType: ServiceType[] }) {
   const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null);
@@ -12,7 +13,7 @@ export default function Layanan({ services, serviceType }: { services: Services[
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [minPrice, setMinPrice] = useState<number | null>(null);
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
-
+  const router = useRouter();
   const filteredServices = useMemo(() => {
     let result = [...services];
 
@@ -48,9 +49,14 @@ export default function Layanan({ services, serviceType }: { services: Services[
   const [cartItems, setCartItems] = useState<Services[]>([]);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+      return;
+    }
     const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
     setCartItems(existingCart);
-  }, []);
+  }, [router]);
 
   const handleAddToCart = (serviceId: number) => {
     const serviceStorage = services.filter((service) => service.id === serviceId);

@@ -93,7 +93,7 @@ export const GetHistoryTransaction = async (req: Request, res: Response) => {
 };
 export const CreateTransaction = async (req: Request, res: Response) => {
   try {
-    const { cartId, employeeId, notes, paymentMethod } = req.body;
+    const { cartId, notes, paymentMethod } = req.body;
     const token = req.headers["authorization"]?.split(" ")[1];
     const decodeToken = jwt.decode(token!);
     const data = decodeToken as UserData;
@@ -120,20 +120,11 @@ export const CreateTransaction = async (req: Request, res: Response) => {
       });
       return;
     }
-    const checkExistingEmployee = await prisma.employee.findUnique({
-      where: { id: employeeId },
-    });
-    if (!checkExistingEmployee) {
-      res.status(404).json({
-        status: false,
-        message: "Employee Not Found",
-      });
-      return;
-    }
+
     const createTransaction = await prisma.transaksi.create({
       data: {
         user: { connect: { id: data.id } },
-        employee: { connect: { id: employeeId } },
+        cart: { connect: { id: cartId } },
         notes,
         totalAmount: checkExistingCart.service.reduce((acc, service) => acc + service.price, 0),
         paymentMethod,
@@ -164,13 +155,60 @@ export const CreateTransaction = async (req: Request, res: Response) => {
       });
       return;
     }
-    await prisma.cart.delete({
-      where: { id: cartId },
-    });
     res.status(201).json({
       status: true,
       data: createTransaction,
       message: "Transaction has been created",
+    });
+  } catch (error) {
+    console.log(error as Error);
+    res.status(500).json({
+      status: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const AddEmployeeToTransaction = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { employeeId } = req.body;
+    const checkTransaction = await prisma.transaksi.findUnique({
+      where: { id: Number(id) },
+    });
+    if (!checkTransaction) {
+      res.status(404).json({
+        status: false,
+        message: "Transaction Not Found",
+      });
+      return;
+    }
+    const checkEmployee = await prisma.employee.findUnique({
+      where: { id: Number(employeeId) },
+    });
+    if (!checkEmployee) {
+      res.status(404).json({
+        status: false,
+        message: "Employee Not Found",
+      });
+      return;
+    }
+    const updateTransaction = await prisma.transaksi.update({
+      where: { id: Number(id) },
+      data: {
+        employee: { connect: { id: Number(employeeId) } },
+        updatedAt: new Date(),
+      },
+      include: {
+        DetailTransaksi: true,
+        user: true,
+        employee: true,
+      },
+    });
+    res.status(200).json({
+      status: true,
+      data: updateTransaction,
+      message: "Employee has been added to transaction",
     });
   } catch (error) {
     console.log(error as Error);

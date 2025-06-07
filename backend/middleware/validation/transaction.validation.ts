@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from "express";
 
 const transactionSchema = joi.object({
   cartId: joi.number().integer().required(),
-  employeeId: joi.number().integer().required(),
+  employeeId: joi.number().integer().optional(),
   paymentMethod: joi.string().valid("CASH", "CREDIT_CARD", "BANK_TRANSFER").required(),
   notes: joi.string().max(500).optional(),
 });

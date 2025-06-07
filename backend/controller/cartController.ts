@@ -89,57 +89,26 @@ export const AddToCart = async (req: Request, res: Response) => {
       res.status(400).json({ message: "Some service IDs are invalid" });
       return;
     }
-    if (checkExistingUser.Cart?.id) {
-      const existingCart = await prisma.cart.findUnique({
-        where: { id: checkExistingUser.Cart.id },
-        include: {
-          service: true,
+
+    const newCart = await prisma.cart.create({
+      data: {
+        user: { connect: { id: Number(data.id) } },
+        service: {
+          connect: serviceId.map((id: number) => ({ id })),
         },
-      });
-      if (!existingCart) {
-        res.status(404).json({ message: "Cart not found" });
-        return;
-      }
-      const updatedCart = await prisma.cart.update({
-        where: { id: existingCart.id },
-        data: {
-          service: {
-            connect: serviceId.map((id: number) => ({ id })),
-            disconnect: existingCart.service.filter((service) => !serviceId.includes(service.id as never)).map((service) => ({ id: service.id })),
-          },
-          updatedAt: new Date(),
-          totalAmount: checkExistingService.reduce((total, service) => total + service.price, 0),
-        },
-        include: {
-          service: true,
-        },
-      });
-      res.status(200).json({
-        status: true,
-        data: updatedCart,
-        message: "Service has been updated to cart",
-      });
-    } else {
-      const newCart = await prisma.cart.create({
-        data: {
-          userId: Number(data.id),
-          service: {
-            connect: serviceId.map((id: number) => ({ id })),
-          },
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          totalAmount: checkExistingService.reduce((total, service) => total + service.price, 0),
-        },
-        include: {
-          service: true,
-        },
-      });
-      res.status(201).json({
-        status: true,
-        data: newCart,
-        message: "Service has been added to cart",
-      });
-    }
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        totalAmount: checkExistingService.reduce((total, service) => total + service.price, 0),
+      },
+      include: {
+        service: true,
+      },
+    });
+    res.status(201).json({
+      status: true,
+      data: newCart,
+      message: "Service has been added to cart",
+    });
   } catch (error) {
     console.log(error as Error);
     res.status(500).json({

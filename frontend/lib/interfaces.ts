@@ -1,12 +1,12 @@
 export interface User {
-  id: number;
-  name?: string;
+  id?: number;
+  name: string;
   email: string;
   password?: string;
-  role: "CUSTOMER" | "ADMIN";
-  Transaksi: Transaksi[];
-  createdAt: Date;
-  updatedAt: Date;
+  role?: "CUSTOMER" | "ADMIN";
+  Transaksi?: Transaksi[];
+  createdAt?: Date;
+  updatedAt?: Date;
   cartId?: number;
   Cart?: Cart;
 }
@@ -62,7 +62,7 @@ export interface DetailTransaksi {
   transaksiId: number;
   createdAt: Date;
   updatedAt: Date;
-  Transaksi: Transaksi; // Circular reference, pastikan di-handle sesuai kebutuhan
+  Transaksi: Transaksi;
 }
 
 export interface Transaksi {

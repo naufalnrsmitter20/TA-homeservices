@@ -1,10 +1,11 @@
 import express from "express";
-import { CreateTransaction, DeleteTransaction, GetAllTransaction, GetHistoryTransaction, GetTransactionById } from "../controller/transactionController";
+import { CreateTransaction, DeleteTransaction, GetAllTransaction, GetHistoryTransaction, GetTransactionById, AddEmployeeToTransaction } from "../controller/transactionController";
 import { ValidateTransaction } from "../middleware/validation/transaction.validation";
 import { verifyAdmin, verifyToken } from "../middleware/verifyToken";
 const app = express.Router();
 
 app.get("/", [verifyAdmin], GetAllTransaction);
+app.put("/addEmployee", [verifyAdmin], AddEmployeeToTransaction);
 app.get("/history", [verifyToken], GetHistoryTransaction);
 app.get("/:id", [verifyToken], GetTransactionById);
 app.post("/", [verifyToken, ValidateTransaction], CreateTransaction);

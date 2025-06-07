@@ -17,7 +17,7 @@ model User {
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
   cartId    Int?
-  Cart      Cart?       @relation("userToCart")
+  Cart      Cart[]
 }
 
 model Employee {
@@ -58,8 +58,9 @@ model Cart {
   id          Int       @id @default(autoincrement())
   userId      Int       @unique
   totalAmount Int       @default(0)
-  user        User      @relation("userToCart", fields: [userId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
   service     Service[]
+  transaksi Transaksi? @relation("cartToTransaction")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
@@ -67,8 +68,8 @@ model Cart {
 model Transaksi {
   id                Int               @id @default(autoincrement())
   userId            Int
-  employeeId        Int
-  employee          Employee          @relation(fields: [employeeId], references: [id])
+  employeeId        Int?
+  employee          Employee?          @relation(fields: [employeeId], references: [id])
   transactionStatus Status            @default(PENDING)
   paymentStatus     PaymentStatus     @default(UNPAID)
   totalAmount       Int               @default(0)
@@ -78,6 +79,8 @@ model Transaksi {
   notes             String?           @db.Text
   user              User              @relation(fields: [userId], references: [id])
   DetailTransaksi   DetailTransaksi[] @relation("TransaksiToDetailTransaksi")
+  cartId           Int? @unique
+  cart Cart?  @relation("cartToTransaction", fields: [cartId], references: [id])
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 }
@@ -90,7 +93,7 @@ model DetailTransaksi {
   transaksiId  Int
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-  Transaksi    Transaksi @relation("TransaksiToDetailTransaksi", fields: [transaksiId], references: [id])
+  Transaksi    Transaksi @relation("TransaksiToDetailTransaksi", fields: [transaksiId], references: [id], onDelete: Cascade)
 }
 
 enum Role {
