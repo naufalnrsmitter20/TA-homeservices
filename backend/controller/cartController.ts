@@ -77,6 +77,8 @@ export const AddToCart = async (req: Request, res: Response) => {
         Cart: true,
       },
     });
+    console.log(checkExistingUser);
+
     if (!checkExistingUser) {
       res.status(404).json({ message: "User not found" });
       return;
@@ -89,6 +91,7 @@ export const AddToCart = async (req: Request, res: Response) => {
       res.status(400).json({ message: "Some service IDs are invalid" });
       return;
     }
+    console.log(data.id);
 
     const newCart = await prisma.cart.create({
       data: {

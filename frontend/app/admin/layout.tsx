@@ -24,10 +24,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${PoppinsFont.className} antialiased flex gap-x-4`}>
-        <Sidebar />
-        <div>{children}</div>
-        <Toaster />
-        <ProtectedAdmin />
+        <ProtectedAdmin>
+          <Sidebar />
+          <div>{children}</div>
+          <Toaster />
+        </ProtectedAdmin>
       </body>
     </html>
   );

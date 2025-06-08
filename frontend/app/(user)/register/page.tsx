@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { ChangeEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -10,12 +10,17 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      router.push("/profile");
+    }
+  });
   const handleLogin = async (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
     const toastId = toast.loading("Logging in...");
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -85,9 +90,9 @@ export default function Register() {
         </button>
 
         <p className="text-center text-sm text-gray-700 mt-6">
-          Do you have an account?
-          <Link href="/login">
-            <div className="text-blue-600 font-medium hover:underline">Login</div>
+          Do you have an account? ]{" "}
+          <Link href="/login" className="text-blue-600 font-medium hover:underline">
+            Login
           </Link>
         </p>
       </form>

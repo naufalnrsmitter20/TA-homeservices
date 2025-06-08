@@ -15,7 +15,7 @@ export default function Table() {
   useEffect(() => {
     async function Fetching() {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:5000/api/services/type", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/services/type`, {
         method: "GET",
         cache: "no-store",
         headers: {
@@ -97,7 +97,7 @@ export default function Table() {
 
   const deteleUserData = async (id: number) => {
     const token = localStorage.getItem("token");
-    const res = await fetch(`http://localhost:5000/api/services/type/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/services/type/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

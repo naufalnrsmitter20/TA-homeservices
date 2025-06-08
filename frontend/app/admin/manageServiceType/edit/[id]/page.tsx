@@ -12,7 +12,7 @@ export default function EditServicesType() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     async function fecthData() {
-      const res = await fetch(`http://localhost:5000/api/services/type/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/services/type/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -34,8 +34,7 @@ export default function EditServicesType() {
       const token = localStorage.getItem("token");
 
       const formData = new FormData(e.currentTarget as HTMLFormElement);
-      console.log(Object.fromEntries(formData.entries()));
-      const res = await fetch(`http://localhost:5000/api/services/type/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/services/type/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -62,7 +61,7 @@ export default function EditServicesType() {
       <form onSubmit={HandleSubmit} className="space-y-2 max-w-md">
         <div className="relative z-0 w-full mb-5 group">
           <input
-            type="name"
+            type="text"
             name="name"
             id="name"
             className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-amber-400 peer"

@@ -11,6 +11,7 @@ import cartRoute from "./routes/cartRoute";
 import transactionRoute from "./routes/transactionRoute";
 
 const app = express();
+const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 dotenv.config();
@@ -25,6 +26,6 @@ app.use(`/api/transaction`, transactionRoute);
 
 app.use(express.static(path.join(__dirname, "..", "public")));
 
-app.listen(5000, () => {
-  console.log(`[server]: Server is running at http://localhost:${5000}`);
+app.listen(port, () => {
+  console.log(`[server]: Server is running at port ${port}`);
 });

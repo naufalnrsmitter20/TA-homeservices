@@ -85,9 +85,8 @@ export interface Transaksi {
 
 export enum Status {
   PENDING = "PENDING",
-  ONGOING = "ONGOING",
-  COMPLETED = "COMPLETED",
-  CANCELLED = "CANCELLED",
+  SUCCESS = "SUCCESS",
+  FAILED = "FAILED",
 }
 
 export enum PaymentStatus {

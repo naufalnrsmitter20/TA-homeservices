@@ -9,6 +9,8 @@ export const GetAllTransaction = async (req: Request, res: Response) => {
       include: {
         user: true,
         DetailTransaksi: true,
+        employee: true,
+        _count: true,
       },
     });
     res.status(200).json({
@@ -100,6 +102,7 @@ export const CreateTransaction = async (req: Request, res: Response) => {
     const checkExistingUser = await prisma.user.findUnique({
       where: { id: data.id },
     });
+
     if (!checkExistingUser) {
       res.status(404).json({
         status: false,
@@ -169,6 +172,56 @@ export const CreateTransaction = async (req: Request, res: Response) => {
   }
 };
 
+export const PayTransaction = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const checkTransaction = await prisma.transaksi.findUnique({
+      where: { id: Number(id) },
+    });
+
+    if (!checkTransaction) {
+      res.status(404).json({
+        status: false,
+        message: "Transaction Not Found",
+      });
+      return;
+    }
+    if (checkTransaction.paymentStatus === "PAID") {
+      res.status(400).json({
+        status: false,
+        message: "Transaction has already been paid",
+      });
+      return;
+    }
+    const updateTransaction = await prisma.transaksi.update({
+      where: { id: Number(id) },
+      data: {
+        paymentStatus: "PAID",
+        transactionStatus: "SUCCESS",
+        updatedAt: new Date(),
+      },
+      include: {
+        DetailTransaksi: true,
+        user: true,
+        employee: true,
+      },
+    });
+    if (updateTransaction) {
+      res.status(200).json({
+        status: true,
+        data: updateTransaction,
+        message: "Transaction has been paid",
+      });
+    }
+  } catch (error) {
+    console.log(error as Error);
+    res.status(500).json({
+      status: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
 export const AddEmployeeToTransaction = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -205,11 +258,13 @@ export const AddEmployeeToTransaction = async (req: Request, res: Response) => {
         employee: true,
       },
     });
-    res.status(200).json({
-      status: true,
-      data: updateTransaction,
-      message: "Employee has been added to transaction",
-    });
+    if (updateTransaction) {
+      res.status(200).json({
+        status: true,
+        data: updateTransaction,
+        message: "Employee has been added to transaction",
+      });
+    }
   } catch (error) {
     console.log(error as Error);
     res.status(500).json({

@@ -13,8 +13,7 @@ export default function AddUser() {
     try {
       const token = localStorage.getItem("token");
       const formData = new FormData(e.currentTarget as HTMLFormElement);
-      console.log(Object.fromEntries(formData.entries()));
-      const res = await fetch(`http://localhost:5000/api/users`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

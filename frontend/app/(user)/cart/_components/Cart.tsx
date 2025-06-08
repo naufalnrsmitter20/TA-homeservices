@@ -9,10 +9,15 @@ export default function Cart() {
   const [cartItems, setCartItems] = useState<Services[]>([]);
   const router = useRouter();
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+      return;
+    }
     const tempCartStorage = localStorage.getItem("cart");
     const cartItems = tempCartStorage ? JSON.parse(tempCartStorage) : [];
     setCartItems(cartItems);
-  }, []);
+  }, [router]);
   const totalPrice = cartItems.reduce((acc, cur) => acc + cur.price, 0);
   return (
     <div className="min-h-screen bg-white flex flex-col">

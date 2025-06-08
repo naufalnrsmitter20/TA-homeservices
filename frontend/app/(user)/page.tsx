@@ -2,7 +2,7 @@ import React from "react";
 import Home from "./_components/Home";
 
 export default async function page() {
-  const serviceType = await fetch("http://localhost:5000/api/services/type", {
+  const serviceType = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/services/type`, {
     cache: "no-store",
   }).then((res) => {
     if (!res.ok) {

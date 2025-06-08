@@ -41,7 +41,7 @@ export default function CheckOut() {
       }
       const token = localStorage.getItem("token");
       const cartItems = JSON.parse(cartStorage);
-      const res = await fetch("http://localhost:5000/api/cart", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -75,7 +75,7 @@ export default function CheckOut() {
         return;
       }
 
-      const res = await fetch("http://localhost:5000/api/transaction", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transaction`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,5 +1,5 @@
 "use client";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -9,11 +9,18 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      router.push("/profile");
+    }
+  });
+
   const handleLogin = async (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
     const toastId = toast.loading("Logging in...");
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -34,7 +41,13 @@ export default function LoginPage() {
         localStorage.setItem("token", data.data.token);
         localStorage.setItem("userData", JSON.stringify(data.data.user));
         router.refresh();
-        router.push("/profile");
+        if (data.data.user.role === "ADMIN") {
+          router.push("/admin");
+          return;
+        } else {
+          router.push("/profile");
+          return;
+        }
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -75,8 +88,8 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-gray-700 mt-6">
           Don{"'"}t have an account?{" "}
-          <Link href="/register">
-            <div className="text-blue-600 font-medium hover:underline">Register</div>
+          <Link href="/register" className="text-blue-600 font-medium hover:underline">
+            Register
           </Link>
         </p>
       </form>

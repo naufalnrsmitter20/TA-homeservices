@@ -5,7 +5,7 @@ const EmployeeSchema = joi.object({
   email: joi.string().email().required(),
   phone: joi
     .string()
-    .pattern(/^[0-9]{10}$/)
+    .pattern(/^[0-9]{12}$/)
     .required(),
   position: joi.string().min(3).max(50).required(),
 });

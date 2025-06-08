@@ -22,7 +22,7 @@ export default function AddServices() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     async function fetchData() {
-      const resServicesType = await fetch("http://localhost:5000/api/services/type", {
+      const resServicesType = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/services/type`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -44,8 +44,7 @@ export default function AddServices() {
     try {
       const token = localStorage.getItem("token");
       const formData = new FormData(e.target as HTMLFormElement);
-      console.log(selectedImage);
-      const res = await fetch(`http://localhost:5000/api/services/`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/services/`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

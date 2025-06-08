@@ -23,7 +23,7 @@ export default function Navbar() {
         toast.error("You are not logged in.");
         return;
       }
-      const res = await fetch("http://localhost:5000/api/auth/logout", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -59,40 +59,6 @@ export default function Navbar() {
           <li className="text-gray-900 hover:text-amber-400 duration-200">
             <Link href={"/layanan"}>Layanan</Link>
           </li>
-          {/* <li className="relative">
-            <button onClick={toggleDropdown} className="flex items-center justify-between w-full py-2 px-3 text-gray-900 rounded-sm md:hover:bg-transparent md:border-0 md:hover:text-amber-400 md:p-0 md:w-auto duration-200">
-              Layanan
-              <svg className="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
-              </svg>
-            </button>
-            {isOpen && (
-              <div className="z-10 font-normal absolute -right-10 top-14 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 ">
-                <ul className="py-2 text-sm text-gray-700" aria-labelledby="dropdownLargeButton">
-                  <li>
-                    <Link href="/layanan/handyman" className="block px-4 py-2 hover:bg-gray-100">
-                      Handyman Service
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/layanan/cleaning_service" className="block px-4 py-2 hover:bg-gray-100">
-                      Cleaning Service
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/layanan/daycare" className="block px-4 py-2 hover:bg-gray-100">
-                      Daycare
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/layanan/security" className="block px-4 py-2 hover:bg-gray-100">
-                      Security Service
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            )}
-          </li> */}
           {isLoggedIn ? (
             <>
               <li className="text-gray-900 hover:text-amber-400 duration-200">

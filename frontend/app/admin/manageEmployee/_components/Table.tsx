@@ -1,22 +1,21 @@
 "use client";
-import { Services } from "@/lib/interfaces";
+import { Employee } from "@/lib/interfaces";
 import { Pencil, Trash2 } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import DataTable, { TableColumn } from "react-data-table-component";
 import toast from "react-hot-toast";
 
 export default function Table() {
-  const [services, setServices] = useState<Services[]>([]);
+  const [servicesType, setServicesType] = useState<Employee[]>([]);
   const router = useRouter();
   const [loader, setLoader] = useState(true);
   const [searchInput, setSearchInput] = useState<string>("");
-  const [filteredServices, setFilteredServices] = useState<Services[]>(services);
+  const [filteredUser, setFilteredUser] = useState<Employee[]>(servicesType);
   useEffect(() => {
     async function Fetching() {
       const token = localStorage.getItem("token");
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/services`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/employee`, {
         method: "GET",
         cache: "no-store",
         headers: {
@@ -25,34 +24,26 @@ export default function Table() {
         },
       });
       const user = await res.json();
-      setServices(user.data);
+      setServicesType(user.data);
     }
     Fetching();
   }, []);
+
   useEffect(() => {
     const filterProjects = () => {
-      const filteredByName = services.filter((x) => x?.name?.toLowerCase().includes(searchInput.toLowerCase()));
-      setFilteredServices(filteredByName);
+      const filteredByName = servicesType.filter((x) => x?.name?.toLowerCase().includes(searchInput.toLowerCase()));
+      setFilteredUser(filteredByName);
     };
     filterProjects();
-  }, [searchInput, services]);
+  }, [searchInput, servicesType]);
   const handleSearchInput = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value);
   };
 
-  const column: TableColumn<Services>[] = [
+  const column: TableColumn<Employee>[] = [
     {
       name: "No",
       selector: (row, idx) => (idx as number) + 1,
-      sortable: true,
-    },
-    {
-      name: "Attachment",
-      cell: (row) => (
-        <div>
-          <Image src={row.attachment} alt={row.name} width={100} height={100} className="size-10 object-cover" />
-        </div>
-      ),
       sortable: true,
     },
     {
@@ -61,18 +52,18 @@ export default function Table() {
       sortable: true,
     },
     {
-      name: "Service Type",
-      selector: (row) => row.ServicesType.name as string,
+      name: "Email",
+      selector: (row) => row.email,
       sortable: true,
     },
     {
-      name: "Description",
-      selector: (row) => row.description,
+      name: "Phone",
+      selector: (row) => row.phone as string,
       sortable: true,
     },
     {
-      name: "Price",
-      selector: (row) => "Rp." + row.price.toLocaleString("id-ID"),
+      name: "Position",
+      selector: (row) => row.position,
       sortable: true,
     },
     {
@@ -89,13 +80,13 @@ export default function Table() {
       name: "Action",
       cell: (row) => (
         <div className="flex gap-x-3">
-          <button title="Edit" onClick={() => editServicesData(row)} className="p-2 bg-blue-500 text-white rounded-lg hover:scale-110 active:scale-105 duration-150">
+          <button title="Edit" onClick={() => editServiceTypeData(row)} className="p-2 bg-blue-500 text-white rounded-lg hover:scale-110 active:scale-105 duration-150">
             <Pencil size={14} />
           </button>
           <button
             title="Delete"
             onClick={() => {
-              const confirmDelete = confirm("Are you sure you want to delete this services?");
+              const confirmDelete = confirm("Are you sure you want to delete this service type?");
               if (confirmDelete) {
                 deteleUserData(row.id as number);
               }
@@ -110,13 +101,13 @@ export default function Table() {
     },
   ];
 
-  function editServicesData(data: Services) {
-    router.push(`/admin/manageServices/edit/${data.id}`);
+  function editServiceTypeData(data: Employee) {
+    router.push(`/admin/manageEmployee/edit/${data.id}`);
   }
 
   const deteleUserData = async (id: number) => {
     const token = localStorage.getItem("token");
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/services/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/employee/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -125,8 +116,8 @@ export default function Table() {
     });
     const data = await res.json();
     if (res.ok) {
-      setServices(services.filter((user) => user.id !== id));
-      setFilteredServices(filteredServices.filter((user) => user.id !== id));
+      setServicesType(servicesType.filter((x) => x.id !== id));
+      setFilteredUser(filteredUser.filter((x) => x.id !== id));
     }
     toast.success(data.message);
     router.refresh();
@@ -176,14 +167,14 @@ export default function Table() {
           </label>
         </div>
         <button
-          onClick={() => router.push("/admin/manageServices/add")}
+          onClick={() => router.push("/admin/manageEmployee/add")}
           type="button"
           className="focus:outline-none text-white bg-amber-400 hover:bg-amber-300 focus:ring-4 focus:ring-amber-50 cursor-pointer font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
         >
           Add New
         </button>
       </div>
-      <DataTable columns={column} data={filteredServices} pagination highlightOnHover />
+      <DataTable columns={column} data={filteredUser} pagination highlightOnHover />
     </div>
   );
 }

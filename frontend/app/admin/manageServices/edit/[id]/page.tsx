@@ -32,7 +32,7 @@ export default function EditServices() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     async function fecthData() {
-      const resServices = await fetch(`http://localhost:5000/api/services/${id}`, {
+      const resServices = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/services/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -45,7 +45,7 @@ export default function EditServices() {
       const data = await resServices.json();
       setServicesData(data.data);
 
-      const resServicesType = await fetch("http://localhost:5000/api/services/type", {
+      const resServicesType = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/services/type`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -67,7 +67,7 @@ export default function EditServices() {
       const token = localStorage.getItem("token");
       const formData = new FormData(e.target as HTMLFormElement);
       console.log(selectedImage);
-      const res = await fetch(`http://localhost:5000/api/services/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/services/${id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,

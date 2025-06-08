@@ -1,18 +1,25 @@
 "use client";
-import { Transaksi } from "@/lib/interfaces";
+import { Employee, Transaksi } from "@/lib/interfaces";
+import { AlignJustify, ContactRound } from "lucide-react";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import DataTable, { TableColumn } from "react-data-table-component";
+import Modal from "./Modal";
+import InsertEmployee from "./InsertEmployee";
 
 export default function Table() {
   const [transaction, setTransaction] = useState<Transaksi[]>([]);
   const [loader, setLoader] = useState(true);
   const [searchInput, setSearchInput] = useState<string>("");
   const [filteredUser, setFilteredUser] = useState<Transaksi[]>(transaction);
+  const [modal, setModal] = useState<boolean>(false);
+  const [modalData, setModalData] = useState<Transaksi | null>(null);
+  const [EmployeeModal, setEmployeeModal] = useState<boolean>(false);
+  const [employeeModalData, setEmployeeModalData] = useState<Employee[]>([]);
 
   useEffect(() => {
     async function Fetching() {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:5000/api/transaction", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transaction`, {
         method: "GET",
         cache: "no-store",
         headers: {
@@ -22,6 +29,17 @@ export default function Table() {
       });
       const user = await res.json();
       setTransaction(user.data);
+
+      const resEmployee = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/employee`, {
+        method: "GET",
+        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const employeeData = await resEmployee.json();
+      setEmployeeModalData(employeeData.data);
     }
     Fetching();
   }, []);
@@ -89,6 +107,11 @@ export default function Table() {
       sortable: true,
     },
     {
+      name: "Total Items",
+      selector: (row) => row.DetailTransaksi.length,
+      sortable: true,
+    },
+    {
       name: "Created At",
       selector: (row) => new Date(row.createdAt!).toUTCString(),
       sortable: true,
@@ -98,7 +121,31 @@ export default function Table() {
       selector: (row) => new Date(row.updatedAt!).toUTCString(),
       sortable: true,
     },
+    {
+      name: "View Detail",
+      cell: (row) => (
+        <div className="flex justify-center items-center gap-3 w-full">
+          <button onClick={() => HandleModal(row)} title="View" className="p-2 bg-green-500 text-white rounded-lg hover:scale-110 active:scale-105 duration-150">
+            <AlignJustify size={14} />
+          </button>
+          <button onClick={() => HandleEmpoyeeModal(row)} title="insert" className="p-2 bg-blue-500 text-white rounded-lg hover:scale-110 active:scale-105 duration-150">
+            <ContactRound size={14} />
+          </button>
+        </div>
+      ),
+      sortable: false,
+    },
   ];
+
+  const HandleModal = (data: Transaksi) => {
+    setModal(true);
+    setModalData(data);
+  };
+
+  const HandleEmpoyeeModal = (data: Transaksi) => {
+    setEmployeeModal(true);
+    setModalData(data);
+  };
 
   useEffect(() => {
     setLoader(false);
@@ -145,6 +192,8 @@ export default function Table() {
         </div>
       </div>
       <DataTable columns={column} data={filteredUser} pagination highlightOnHover />
+      {modal && <Modal data={modalData} setIsOpenModal={setModal} />}
+      {EmployeeModal && <InsertEmployee employeeData={employeeModalData} data={modalData} setIsOpenModal={setEmployeeModal} />}
     </div>
   );
 }
